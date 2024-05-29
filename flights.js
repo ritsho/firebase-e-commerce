@@ -14,10 +14,10 @@ async function FillFlightsFromDatabase() {
     flights.forEach((doc) => {
         console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
 
-        var product = doc.data();
-        const container = document.getElementById('product-container');
-        const productElement = createProductElement(product.image, product.name, product.price, product.description);
-        container.appendChild(productElement);
+        var flightDetails = doc.data();
+        const flightsContainer = document.getElementById('flights-container');
+        const flightElement = createFlightElement(flightDetails.image, flightDetails.name, flightDetails.price, flightDetails.description);
+        flightsContainer.appendChild(flightElement);
     });
 }
 
@@ -47,29 +47,42 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
+const fullScreenContainer = document.querySelector('.full-screen');
+const fullScreenImage = document.querySelector('.full-screen-image');
 
-function createProductElement(imageSrc, name, price, description) {
-    const productDiv = document.createElement('div');
-    productDiv.className = 'product';
+// image fullscreen viewer - on click, close the image
+fullScreenContainer.addEventListener('click', () => {
+    fullScreenContainer.classList.add('hidden');
+  });
+
+function createFlightElement(imageSrc, name, price, description) {
+    const flightDiv = document.createElement('div');
+    flightDiv.className = 'flight';
 
     const img = document.createElement('img');
     img.src = imageSrc;
     img.alt = name;
-    productDiv.appendChild(img);
+
+    // on image click, show it in full screen
+    img.addEventListener('click', () => {
+        fullScreenImage.src = imageSrc;
+        fullScreenContainer.classList.remove('hidden');
+      });
+    flightDiv.appendChild(img);
 
     const h2 = document.createElement('h2');
     h2.textContent = name;
-    productDiv.appendChild(h2);
+    flightDiv.appendChild(h2);
 
     const priceP = document.createElement('p');
     priceP.className = 'price';
     priceP.textContent = price;
-    productDiv.appendChild(priceP);
+    flightDiv.appendChild(priceP);
 
     const descP = document.createElement('p');
     descP.className = 'description';
     descP.textContent = description;
-    productDiv.appendChild(descP);
+    flightDiv.appendChild(descP);
 
-    return productDiv;
+    return flightDiv;
 }

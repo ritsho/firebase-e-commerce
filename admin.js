@@ -7,7 +7,6 @@ const app = initializeApp(firebaseConfig);
 
 
 function createTableRow(singleFlight) {
-    console.log(singleFlight);
     const row = document.createElement('tr');
 
     const cell1 = document.createElement('td');
@@ -92,12 +91,22 @@ async function refreshFlightsList() {
     table.innerHTML = ''; 
 
     const flights = await flightsService.getAllFlights();
-    flights.forEach(singleFlight => {
+    const sortedFlights = flights.sort((a, b) => {
+        if (a.data().createdDate){
+            return a.data().createdDate - b.data().createdDate;
+        }else{
+            // compare by name
+            return a.data().name.localeCompare(b.data().name);
+        }
+    }
+    );
+    console.log(sortedFlights);
+
+    sortedFlights.forEach(singleFlight => {
         // add to tbody
         const newRow = createTableRow(singleFlight);
         table.appendChild(newRow);
     });
-
 }
 
 await refreshFlightsList();
@@ -105,10 +114,11 @@ await refreshFlightsList();
 const addFlightBtn = document.getElementById('add-flight-btn');
 addFlightBtn.addEventListener('click', async () => {
     flightsService.createFlight( {
-        name: "?",
+        name: "???",
         image: "https://?.com/image",
         price: "$500",
-        description: "Amazing location"
+        description: "Amazing location",
+        createdDate: new Date().toISOString()
     });
     await refreshFlightsList();
 });
@@ -123,15 +133,25 @@ signoutLink.addEventListener("click", function (event) {
     window.location.href = "login.html";
 });
 
+// // data samples:
+// async function addDataToProductsTable() {
+//     var list = [];
+//     // add json item to list
+//     list.push({"image":"https://a57.foxnews.com/static.foxnews.com/foxnews.com/content/uploads/2023/08/720/405/eiffel-tower-paris.jpg","description":"Explore the City of Light's iconic landmarks like the Eiffel Tower and the Louvre Museum","name":"Paris","price":"$1245"});
+//     list.push({"price":"$987","image":"https://a.loveholidays.com/media-library/~production/6d7b5475d338ee30647c4b88d27fea204429081c-3840x1408.jpg?auto=avif%2Cwebp&quality=80&dpr=1.5&optimize=high&fit=crop&width=1280&height=380","name":"Tokyo","description":"Experience the unique blend of modern and traditional in Japan's vibrant capital"});
+//     list.push({"image":"https://i.natgeofe.com/n/bd48279e-be5a-4f28-9551-5cb917c6766e/GettyImages-103455489cropped.jpg?w=1280&h=853","description":"Soak up the sun on Bondi Beach and marvel at the iconic Sydney Opera House","name":"Sydney","price":"$1567"});
+//     list.push({"image":"https://theplanetd.com/images/Top-Things-to-in-Rio-De-Janeiro.jpg","description":"Dance the night away at lively samba clubs and visit the iconic Christ the Redeemer statue","price":"$845","name":"Rio de Janeiro"});
+//     list.push({"description":"Relax on pristine beaches, explore lush jungles, and immerse yourself in Balinese culture","price":"$689","name":"Bali","image":"https://imageio.forbes.com/specials-images/imageserve/675172642/pura-ulun-danu-bratan-temple-in-Bali-/960x0.jpg?format=jpg&width=1440"});
+//     list.push({"description":"Get lost in the vibrant souks and marvel at the ornate architecture of this Moroccan gem","image":"https://media.tacdn.com/media/attractions-splice-spp-674x446/09/f7/05/90.jpg","price":"$578","name":"Marrakech"});
+//     list.push({"price":"$945","image":"https://www.telegraph.co.uk/content/dam/Travel/Destinations/Europe/Iceland/Reykjavik/reykjavik-guide-lead-image-48-hours.jpg?imwidth=1280","description":"Chase the Northern Lights and soak in natural hot springs in this Icelandic wonderland","name":"Reykjavik"});
+//     list.push({"name":"Havana","image":"https://adriana-maria.com/wp-content/uploads/2021/02/DSC00189-2-1920x1028.jpg","description":"Step back in time and experience the colorful streets and classic cars of Cuba's capital","price":"$567"});
+//     list.push({"image":"https://lp-cms-production.imgix.net/2021-05/shutterstockRF_1563449509.jpg?auto=format&w=1440&h=810&fit=crop&q=75","price":"$1123","description":"Admire the stunning whitewashed buildings and breathtaking caldera views on this Greek island","name":"Santorini"});
+//     list.push({"name":"Queenstown","image":"https://media.tacdn.com/media/attractions-content--1x-1/10/7d/70/d6.jpg","price":"$1289","description":"Enjoy adventure sports and stunning natural scenery in New Zealand's adrenaline capital"});
+//     list.forEach(async singleFlight  => {
+//         // add to tbody
+//         res =  await flightsService.createFlight(singleFlight);
+//         console.log(res);
+//     });
+// }
+// addDataToProductsTable() ;
 
-// data samples:
-// {"image":"https://a57.foxnews.com/static.foxnews.com/foxnews.com/content/uploads/2023/08/720/405/eiffel-tower-paris.jpg","description":"Explore the City of Light's iconic landmarks like the Eiffel Tower and the Louvre Museum","name":"Paris","price":"$1245"}
-// {"price":"$987","image":"https://a.loveholidays.com/media-library/~production/6d7b5475d338ee30647c4b88d27fea204429081c-3840x1408.jpg?auto=avif%2Cwebp&quality=80&dpr=1.5&optimize=high&fit=crop&width=1280&height=380","name":"Tokyo","description":"Experience the unique blend of modern and traditional in Japan's vibrant capital"}
-// {"image":"https://i.natgeofe.com/n/bd48279e-be5a-4f28-9551-5cb917c6766e/GettyImages-103455489cropped.jpg?w=1280&h=853","description":"Soak up the sun on Bondi Beach and marvel at the iconic Sydney Opera House","name":"Sydney","price":"$1567"}
-// {"image":"https://theplanetd.com/images/Top-Things-to-in-Rio-De-Janeiro.jpg","description":"Dance the night away at lively samba clubs and visit the iconic Christ the Redeemer statue","price":"$845","name":"Rio de Janeiro"}
-// {"description":"Relax on pristine beaches, explore lush jungles, and immerse yourself in Balinese culture","price":"$689","name":"Bali","image":"https://imageio.forbes.com/specials-images/imageserve/675172642/pura-ulun-danu-bratan-temple-in-Bali-/960x0.jpg?format=jpg&width=1440"}
-// {"description":"Get lost in the vibrant souks and marvel at the ornate architecture of this Moroccan gem","image":"https://media.tacdn.com/media/attractions-splice-spp-674x446/09/f7/05/90.jpg","price":"$578","name":"Marrakech"}
-// {"price":"$945","image":"https://www.telegraph.co.uk/content/dam/Travel/Destinations/Europe/Iceland/Reykjavik/reykjavik-guide-lead-image-48-hours.jpg?imwidth=1280","description":"Chase the Northern Lights and soak in natural hot springs in this Icelandic wonderland","name":"Reykjavik"}
-// {"name":"Havana","image":"https://adriana-maria.com/wp-content/uploads/2021/02/DSC00189-2-1920x1028.jpg","description":"Step back in time and experience the colorful streets and classic cars of Cuba's capital","price":"$567"}
-// {"image":"https://lp-cms-production.imgix.net/2021-05/shutterstockRF_1563449509.jpg?auto=format&w=1440&h=810&fit=crop&q=75","price":"$1123","description":"Admire the stunning whitewashed buildings and breathtaking caldera views on this Greek island","name":"Santorini"}
-// {"name":"Queenstown","image":"https://media.tacdn.com/media/attractions-content--1x-1/10/7d/70/d6.jpg","price":"$1289","description":"Enjoy adventure sports and stunning natural scenery in New Zealand's adrenaline capital"}
